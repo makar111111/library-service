@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import F
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from books.models import Book
@@ -19,4 +20,17 @@ def create_borrowing(*, book, user, expected_return_date):
         book=book, user=user, expected_return_date=expected_return_date
     )
     book.refresh_from_db()
+    return borrowing
+
+
+@transaction.atomic
+def return_borrowing(borrowing):
+    updated = Borrowing.objects.filter(
+        pk=borrowing.pk, actual_return_date__isnull=True
+    ).update(actual_return_date=timezone.localdate())
+    if not updated:
+        raise ValidationError("This borrowing has already been returned.")
+    Book.objects.filter(pk=borrowing.book_id).update(inventory=F("inventory") + 1)
+    borrowing.refresh_from_db()
+    borrowing.book.refresh_from_db()
     return borrowing
