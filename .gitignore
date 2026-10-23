@@ -13,4 +13,3 @@ staticfiles/
 .local/
 .pytest_cache/
 celerybeat-schedule*
-
