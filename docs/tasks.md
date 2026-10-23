@@ -29,4 +29,3 @@ eight tasks. Docker Compose and CI support running and verifying the project.
 For the course Trello workflow, create columns To Do, In Progress, On Review
 and Done; use the eight rows above as cards in the same dependency order.
 Repository files do not create a Trello account or board.
-

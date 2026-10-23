@@ -10,4 +10,3 @@ gunicorn>=23,<24
 coverage>=7.10,<8
 flake8>=7.3,<8
 black>=25.1,<27
-
