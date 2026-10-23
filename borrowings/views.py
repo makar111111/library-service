@@ -1,12 +1,30 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from borrowings.models import Borrowing
-from borrowings.serializers import BorrowingCreateSerializer, BorrowingReadSerializer
+from borrowings.serializers import (
+    BorrowingCreateSerializer,
+    BorrowingFilterSerializer,
+    BorrowingReadSerializer,
+)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "is_active", bool, description="true: not returned; false: returned."
+            ),
+            OpenApiParameter(
+                "user_id",
+                int,
+                description="Staff only. Customers always see their own records.",
+            ),
+        ]
+    )
+)
 class BorrowingViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -42,4 +60,17 @@ class BorrowingViewSet(
         queryset = self.queryset.all()
         if not self.request.user.is_staff:
             queryset = queryset.filter(user=self.request.user)
+        if self.action == "list":
+            data = self.request.query_params.dict()
+            if not self.request.user.is_staff:
+                data.pop("user_id", None)
+            filters = BorrowingFilterSerializer(data=data)
+            filters.is_valid(raise_exception=True)
+            values = filters.validated_data
+            if "is_active" in values:
+                queryset = queryset.filter(
+                    actual_return_date__isnull=values["is_active"]
+                )
+            if "user_id" in values:
+                queryset = queryset.filter(user_id=values["user_id"])
         return queryset
