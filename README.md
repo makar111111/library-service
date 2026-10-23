@@ -25,11 +25,10 @@ daily overdue reports. This is not the full-time implementation of every task.
 
 ## Quick start with Docker
 
-Requirements: Docker Desktop with Compose. Clone the final implementation
-branch while the eight feature pull requests are awaiting review:
+Requirements: Docker Desktop with Compose. Clone the repository's main branch:
 
 ```sh
-git clone --branch codex/telegram-notifications https://github.com/makar111111/library-service.git
+git clone https://github.com/makar111111/library-service.git
 cd library-service
 ```
 
