@@ -1,0 +1,50 @@
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: library
+          POSTGRES_USER: library
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U library -d library"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_DB: library
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: ci-only-password
+      DJANGO_SECRET_KEY: ci-only-secret-key-at-least-32-characters
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.lock
+      - name: Lint and formatting
+        run: |
+          flake8
+          black --check .
+      - name: Django, migrations and dependencies
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+          python manage.py collectstatic --noinput
+          python -m pip check
+      - name: Behavioral tests, real HTTP and PostgreSQL concurrency
+        run: |
+          coverage run manage.py test --settings=config.test_settings --noinput
+          coverage report
+      - name: Validate API documentation
+        run: python manage.py spectacular --validate --fail-on-warn

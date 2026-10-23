@@ -1,0 +1,14 @@
+.git
+.venv
+venv
+.env
+.env.*
+!.env.sample
+.local
+__pycache__
+*.pyc
+*.sqlite3
+.coverage*
+htmlcov
+coverage.xml
+staticfiles

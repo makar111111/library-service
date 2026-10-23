@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from books.models import Book
 from borrowings.models import Borrowing
+from notifications.services import notify_borrowing_created
 
 
 @transaction.atomic
@@ -19,6 +20,7 @@ def create_borrowing(*, book, user, expected_return_date):
     borrowing = Borrowing.objects.create(
         book=book, user=user, expected_return_date=expected_return_date
     )
+    notify_borrowing_created(borrowing)
     book.refresh_from_db()
     return borrowing
 
