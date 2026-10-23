@@ -7,6 +7,7 @@ celery[redis]>=5.5,<5.7
 requests>=2.32,<3
 psycopg[binary]>=3.2,<4
 gunicorn>=23,<24
+whitenoise>=6.9,<7
 coverage>=7.10,<8
 flake8>=7.3,<8
 black>=25.1,<27

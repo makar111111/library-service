@@ -23,9 +23,11 @@ INSTALLED_APPS = [
     "users",
     "books",
     "borrowings",
+    "notifications",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -56,6 +58,15 @@ DATABASES = {
         "OPTIONS": {"timeout": 20},
     }
 }
+if os.getenv("POSTGRES_HOST"):
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": os.environ["POSTGRES_HOST"],
+        "NAME": os.getenv("POSTGRES_DB", "library"),
+        "USER": os.getenv("POSTGRES_USER", "library"),
+        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
+    }
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation."
@@ -98,4 +109,22 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
+}
+
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_BROKER_CONNECTION_TIMEOUT = 1
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    "socket_connect_timeout": 1,
+    "socket_timeout": 1,
+    "max_retries": 0,
+}
+CELERY_TASK_PUBLISH_RETRY = False
+CELERY_TASK_IGNORE_RESULT = True
+CELERY_BEAT_SCHEDULE = {
+    "retry-pending-borrowing-notifications": {
+        "task": "notifications.tasks.retry_pending_notifications",
+        "schedule": 60.0,
+    }
 }

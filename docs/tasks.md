@@ -5,14 +5,14 @@ selects the following eight, implemented in dependency order:
 
 | Order | Branch | Assignment task | Depends on |
 | --- | --- | --- | --- |
-| 1 | feature/email-users-jwt | Users Service with email and JWT | Project foundation |
-| 2 | feature/books-crud | Books CRUD | 1 |
-| 3 | feature/book-permissions | Admin writes and public reads | 2 |
-| 4 | feature/borrowing-list-detail | Borrowing model, list and detail | 1, 2 |
-| 5 | feature/create-borrowing | Create borrowing and decrease inventory | 4 |
-| 6 | feature/borrowing-filters | Ownership, is_active and staff user_id filters | 4, 5 |
-| 7 | feature/return-borrowing | Return once and restore inventory | 5, 6 |
-| 8 | feature/telegram-notifications | Notify administrators about new borrowings | 5 |
+| 1 | codex/email-users-jwt | Users Service with email and JWT | Project foundation |
+| 2 | codex/books-crud | Books CRUD | 1 |
+| 3 | codex/book-permissions | Admin writes and public reads | 2 |
+| 4 | codex/borrowing-list-detail | Borrowing model, list and detail | 1, 2 |
+| 5 | codex/create-borrowing | Create borrowing and decrease inventory | 4 |
+| 6 | codex/borrowing-filters | Ownership, is_active and staff user_id filters | 4, 5 |
+| 7 | codex/return-borrowing | Return once and restore inventory | 5, 6 |
+| 8 | codex/telegram-notifications | Notify administrators about new borrowings | 5 |
 
 Each task has a separate branch and pull request to `main`. Branches are
 cumulative because merging requires review. Review and merge in the order
