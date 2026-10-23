@@ -1,9 +1,11 @@
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from borrowings.models import Borrowing
+from borrowings.services import return_borrowing
 from borrowings.serializers import (
     BorrowingCreateSerializer,
     BorrowingFilterSerializer,
@@ -53,6 +55,20 @@ class BorrowingViewSet(
             ).data,
             status=status.HTTP_201_CREATED,
         )
+
+    @extend_schema(
+        request=None,
+        responses=BorrowingReadSerializer,
+        description=(
+            "Return your book once. Staff can return any user's borrowing. "
+            "Sets today's date and atomically restores one copy. "
+            "Repeat returns get 400."
+        ),
+    )
+    @action(detail=True, methods=["post"], url_path="return", url_name="return")
+    def return_book(self, request, pk=None):
+        borrowing = return_borrowing(self.get_object())
+        return Response(self.get_serializer(borrowing).data)
 
     def get_queryset(self):
         if getattr(self, "swagger_fake_view", False):
